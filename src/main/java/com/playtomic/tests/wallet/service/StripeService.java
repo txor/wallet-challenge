@@ -1,9 +1,20 @@
 package com.playtomic.tests.wallet.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
+import java.util.Map;
 
 
 /**
@@ -14,7 +25,20 @@ import java.math.BigDecimal;
  */
 @Service
 public class StripeService {
-    final private static BigDecimal THRESHOLD = new BigDecimal(10);
+
+    @NonNull
+    private URI uri;
+
+    @NonNull
+    private RestTemplate restTemplate;
+
+    public StripeService(@Value("stripe.simulator.uri") URI uri, @NotNull RestTemplateBuilder restTemplateBuilder) {
+        this.uri = uri;
+        this.restTemplate =
+                restTemplateBuilder
+                .errorHandler(new StripeRestTemplateResponseErrorHandler())
+                .build();
+    }
 
     /**
      * Charges money in the credit card.
@@ -30,8 +54,17 @@ public class StripeService {
         Assert.notNull(creditCardNumber, "creditCardNumber == null");
         Assert.notNull(amount, "amount == null");
 
-        if (amount.compareTo(THRESHOLD) < 0) {
-            throw new StripeServiceException();
-        }
+        ChargeRequest body = new ChargeRequest(creditCardNumber, amount);
+        restTemplate.postForLocation(uri, body);
+    }
+
+    @AllArgsConstructor
+    private static class ChargeRequest {
+
+        @JsonProperty("credit_card")
+        String creditCardNumber;
+
+        @JsonProperty("amount")
+        BigDecimal amount;
     }
 }
