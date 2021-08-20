@@ -27,13 +27,19 @@ import java.util.Map;
 public class StripeService {
 
     @NonNull
-    private URI uri;
+    private URI chargesUri;
+
+    @NonNull
+    private URI refundsUri;
 
     @NonNull
     private RestTemplate restTemplate;
 
-    public StripeService(@Value("stripe.simulator.uri") URI uri, @NotNull RestTemplateBuilder restTemplateBuilder) {
-        this.uri = uri;
+    public StripeService(@Value("stripe.simulator.charges-uri") @NonNull URI chargesUri,
+                         @Value("stripe.simulator.refunds-uri") @NonNull URI refundsUri,
+                         @NotNull RestTemplateBuilder restTemplateBuilder) {
+        this.chargesUri = chargesUri;
+        this.refundsUri = refundsUri;
         this.restTemplate =
                 restTemplateBuilder
                 .errorHandler(new StripeRestTemplateResponseErrorHandler())
@@ -50,20 +56,28 @@ public class StripeService {
      *
      * @throws StripeServiceException
      */
-    public void charge(String creditCardNumber, BigDecimal amount) throws StripeServiceException {
-        Assert.notNull(creditCardNumber, "creditCardNumber == null");
-        Assert.notNull(amount, "amount == null");
-
+    public void charge(@NonNull String creditCardNumber, @NonNull BigDecimal amount) throws StripeServiceException {
         ChargeRequest body = new ChargeRequest(creditCardNumber, amount);
-        restTemplate.postForLocation(uri, body);
+        // Object.class because we don't read the body here.
+        restTemplate.postForObject(chargesUri, body, Object.class);
+    }
+
+    /**
+     * Refunds the specified payment.
+     */
+    public void refund(@NonNull String paymentId) throws StripeServiceException {
+        // Object.class because we don't read the body here.
+        restTemplate.postForEntity(chargesUri.toString(), null, Object.class, paymentId);
     }
 
     @AllArgsConstructor
     private static class ChargeRequest {
 
+        @NonNull
         @JsonProperty("credit_card")
         String creditCardNumber;
 
+        @NonNull
         @JsonProperty("amount")
         BigDecimal amount;
     }

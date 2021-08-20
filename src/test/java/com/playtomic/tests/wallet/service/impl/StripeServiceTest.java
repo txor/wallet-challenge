@@ -20,7 +20,7 @@ import java.net.URI;
 public class StripeServiceTest {
 
     URI testUri = URI.create("http://how-would-you-test-me.localhost");
-    StripeService s = new StripeService(testUri, new RestTemplateBuilder());
+    StripeService s = new StripeService(testUri, testUri, new RestTemplateBuilder());
 
     @Test
     public void test_exception() {
