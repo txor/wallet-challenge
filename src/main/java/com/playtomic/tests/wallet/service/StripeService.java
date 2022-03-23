@@ -31,9 +31,9 @@ public class StripeService {
     @NonNull
     private RestTemplate restTemplate;
 
-    public StripeService(@Value("stripe.simulator.charges-uri") @NonNull URI chargesUri,
-                         @Value("stripe.simulator.refunds-uri") @NonNull URI refundsUri,
-                         @NotNull RestTemplateBuilder restTemplateBuilder) {
+    public StripeService(@Value("${stripe.simulator.charges-uri}") @NonNull URI chargesUri,
+                         @Value("${stripe.simulator.refunds-uri}") @NonNull URI refundsUri,
+                         @NonNull RestTemplateBuilder restTemplateBuilder) {
         this.chargesUri = chargesUri;
         this.refundsUri = refundsUri;
         this.restTemplate =
@@ -52,10 +52,9 @@ public class StripeService {
      *
      * @throws StripeServiceException
      */
-    public void charge(@NonNull String creditCardNumber, @NonNull BigDecimal amount) throws StripeServiceException {
+    public Payment charge(@NonNull String creditCardNumber, @NonNull BigDecimal amount) throws StripeServiceException {
         ChargeRequest body = new ChargeRequest(creditCardNumber, amount);
-        // Object.class because we don't read the body here.
-        restTemplate.postForObject(chargesUri, body, Object.class);
+        return restTemplate.postForObject(chargesUri, body, Payment.class);
     }
 
     /**
