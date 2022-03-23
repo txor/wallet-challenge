@@ -13,6 +13,10 @@ You have to code endpoints for these operations:
 1. Get a wallet using its identifier.
 1. Top-up money in that wallet using a credit card number. It has to charge that amount internally using a third-party platform.
 
+You don't have to write the following operations, but we will discuss possible solutions during the interview:
+1. How to spend money from the wallet.
+1. How to refund that money.
+
 The basic structure of a wallet is its identifier and its current balance. If you think you need extra fields, add them. We will discuss it in the interview. 
 
 So you can focus on these problems, you have here a maven project with a Spring Boot application. It already contains
