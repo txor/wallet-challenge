@@ -2,8 +2,8 @@ spring.profiles.active: develop
 server:
   port: 8090
 ---
+spring.config.activate.on-profile: develop
 spring:
-  profiles: develop
   jpa:
     show_sql: false
     database: H2
@@ -13,8 +13,8 @@ spring:
 stripe.simulator.charges-uri: https://sandbox.playtomic.io/v1/stripe-simulator/charges
 stripe.simulator.refunds-uri: https://sandbox.playtomic.io/v1/stripe-simulator/payments/{payment_id}/refunds
 ---
+spring.config.activate.on-profile: test
 spring:
-  profiles: test
   jpa:
     show_sql: false
     database: H2
