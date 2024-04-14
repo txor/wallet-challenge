@@ -3,17 +3,18 @@ package com.playtomic.tests.wallet.api;
 import com.playtomic.tests.wallet.domain.getwallet.GetWalletService;
 import com.playtomic.tests.wallet.domain.getwallet.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.getwallet.WalletRequest;
+import com.playtomic.tests.wallet.domain.topup.TopUpRequest;
+import com.playtomic.tests.wallet.domain.topup.TopUpWalletService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class WalletController {
     private Logger log = LoggerFactory.getLogger(WalletController.class);
 
     private final GetWalletService getWalletService;
+    private final TopUpWalletService topUpWalletService;
 
     @RequestMapping("/")
     void log() {
@@ -39,5 +41,17 @@ public class WalletController {
                             return true;
                         })
                 .map(wallet -> new WalletDto(wallet.getId(), String.valueOf(wallet.getBalance())));
+    }
+
+    @PostMapping(value = "/wallets/{id}/topup")
+    public Mono<Void> getWallet(@PathVariable("id") String id, @RequestBody TopUpDto topUp, ServerHttpResponse response) {
+        return Mono.just(new TopUpRequest(id, topUp.creditCard(), new BigDecimal(topUp.amount())))
+                .flatMap(topUpWalletService::topUpWallet)
+                .onErrorComplete(
+                        exception -> {
+                            if (exception instanceof NonExistingWalletException)
+                                response.setStatusCode(HttpStatusCode.valueOf(404));
+                            return true;
+                        });
     }
 }
