@@ -1,5 +1,6 @@
 package com.playtomic.tests.wallet;
 
+import com.playtomic.tests.wallet.domain.model.WalletRepository;
 import com.playtomic.tests.wallet.utils.TestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,13 @@ class WalletApplicationIT {
     private WebTestClient webTestClient;
     @Autowired
     private TestData testData;
+    @Autowired
+    private WalletRepository walletRepository;
 
     @Test
     void getWallet() {
         String walletId = "1234";
-        String walletBalance = "50";
+        Double walletBalance = 50.0;
         testData.givenThereIsAWallet(walletId, walletBalance);
 
         webTestClient
