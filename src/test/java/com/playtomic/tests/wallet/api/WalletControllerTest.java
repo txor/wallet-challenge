@@ -73,7 +73,6 @@ class WalletControllerTest {
         String cardNumber = "4242424242424242";
         String amount = "50";
         String request = "{\"credit-card\": \"" + cardNumber + "\", \"amount\": " + amount + "}";
-        when(topUpWalletService.topUpWallet(any(TopUpRequest.class))).thenReturn(Mono.empty().then());
 
         webTestClient
                 .post()

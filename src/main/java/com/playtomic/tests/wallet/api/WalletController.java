@@ -52,6 +52,6 @@ public class WalletController {
                             if (exception instanceof NonExistingWalletException)
                                 response.setStatusCode(HttpStatusCode.valueOf(404));
                             return true;
-                        });
+                        }).then();
     }
 }
