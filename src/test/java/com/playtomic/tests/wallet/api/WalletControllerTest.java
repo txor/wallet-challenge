@@ -41,7 +41,7 @@ class WalletControllerTest {
         String id = "1";
         String balance = "50.0";
         when(getWalletService.getWallet(any(WalletRequest.class)))
-                .thenReturn(Mono.just(new Wallet(id, new BigDecimal(balance))));
+                .thenReturn(Mono.just(new Wallet(id, new BigDecimal(balance), true)));
 
         webTestClient
                 .get()
@@ -74,7 +74,7 @@ class WalletControllerTest {
         String amount = "50";
         String request = "{\"credit-card\": \"" + cardNumber + "\", \"amount\": " + amount + "}";
         when(topUpWalletService.topUpWallet(any(TopUpRequest.class)))
-                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"))));
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"), true)));
 
         webTestClient
                 .post()

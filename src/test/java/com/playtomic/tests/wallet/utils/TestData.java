@@ -19,7 +19,7 @@ public class TestData {
                 .create(walletRepository.deleteAll())
                 .verifyComplete();
         StepVerifier
-                .create(walletRepository.save(new Wallet(walletId, new BigDecimal(walletBalance))))
+                .create(walletRepository.save(new Wallet(walletId, new BigDecimal(walletBalance), true)))
                 .expectNextCount(1)
                 .expectComplete()
                 .verify();

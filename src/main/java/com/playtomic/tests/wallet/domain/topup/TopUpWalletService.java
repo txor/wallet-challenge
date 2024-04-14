@@ -26,7 +26,7 @@ public class TopUpWalletService {
                                 .onErrorResume(throwable -> throwable instanceof PaymentApiException,
                                         throwable -> Mono.error(new CreditCardPaymentException(throwable)))
                                 .flatMap(payment ->
-                                        walletRepository.save(new Wallet(wallet.getId(), wallet.getBalance().add(topUpRequest.amount()))))
+                                        walletRepository.save(new Wallet(wallet.getId(), wallet.getBalance().add(topUpRequest.amount()), false)))
                 );
     }
 }

@@ -21,7 +21,7 @@ class GetWalletServiceTest {
     void getTheExistingGivenWallet() {
         String walletID = "1234";
         BigDecimal balance = new BigDecimal("50.0");
-        Wallet wallet = new Wallet(walletID, balance);
+        Wallet wallet = new Wallet(walletID, balance, true);
         WalletRepository walletRepository = mock(WalletRepository.class);
         when(walletRepository.findById(eq(walletID))).thenReturn(Mono.just(wallet));
         GetWalletService getWalletService = new GetWalletService(walletRepository);

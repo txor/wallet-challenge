@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -70,7 +72,7 @@ class WalletApplicationIT {
                 .create(walletRepository.findById(walletId))
                 .assertNext(wallet -> {
                     assertEquals(walletId, wallet.getId());
-                    assertEquals(100, wallet.getBalance());
+                    assertEquals(new BigDecimal("100"), wallet.getBalance());
                 })
                 .verifyComplete();
     }

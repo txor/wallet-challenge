@@ -47,11 +47,11 @@ class TopUpWalletServiceTest {
         String creditCard = "4242424242424242";
         BigDecimal amount = new BigDecimal("50");
         when(walletRepository.findById(anyString()))
-                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("50"))));
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("50"), true)));
         when(paymentApiClient.charge(any(ChargeRequest.class)))
                 .thenReturn(Mono.just(new ChargeResponse("1234")));
         when(walletRepository.save(any()))
-                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"))));
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"), true)));
 
         StepVerifier.create(topUpWalletService.topUpWallet(new TopUpRequest(walletId, creditCard, amount)))
                 .expectNextCount(1)
@@ -79,7 +79,7 @@ class TopUpWalletServiceTest {
         String creditCard = "4242424242424242";
         BigDecimal amount = new BigDecimal("5");
         when(walletRepository.findById(anyString()))
-                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("50"))));
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("50"), true)));
         when(paymentApiClient.charge(any(ChargeRequest.class)))
                 .thenReturn(Mono.error(new PaymentApiException()));
 

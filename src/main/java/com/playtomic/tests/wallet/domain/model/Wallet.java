@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 
 import java.math.BigDecimal;
@@ -18,9 +19,11 @@ public class Wallet implements Persistable<String> {
     @Id
     private String id;
     private BigDecimal balance;
+    @Transient
+    private Boolean isNew;
 
     @Override
     public boolean isNew() {
-        return true;
+        return isNew;
     }
 }
