@@ -1,8 +1,8 @@
 package com.playtomic.tests.wallet.api;
 
 import com.playtomic.tests.wallet.domain.getwallet.GetWalletService;
-import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.getwallet.WalletRequest;
+import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.model.Wallet;
 import com.playtomic.tests.wallet.domain.topup.TopUpRequest;
 import com.playtomic.tests.wallet.domain.topup.TopUpWalletService;
@@ -68,11 +68,13 @@ class WalletControllerTest {
     }
 
     @Test
-    void topUpWalletCallsTopUpAndReturnsOk() {
+    void topUpWalletCallsTopUpAndReturnsOkAndTheWallet() {
         String walletId = "1234";
         String cardNumber = "4242424242424242";
         String amount = "50";
         String request = "{\"credit-card\": \"" + cardNumber + "\", \"amount\": " + amount + "}";
+        when(topUpWalletService.topUpWallet(any(TopUpRequest.class)))
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"))));
 
         webTestClient
                 .post()
@@ -81,7 +83,11 @@ class WalletControllerTest {
                 .body(BodyInserters.fromPublisher(Mono.just(request), String.class))
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(walletId)
+                .jsonPath("$.balance").isEqualTo("100");
+        ;
 
         verify(topUpWalletService).topUpWallet(topUpRequestCaptor.capture());
         TopUpRequest topUpRequest = topUpRequestCaptor.getValue();

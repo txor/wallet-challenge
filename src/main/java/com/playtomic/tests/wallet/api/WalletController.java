@@ -1,8 +1,9 @@
 package com.playtomic.tests.wallet.api;
 
 import com.playtomic.tests.wallet.domain.getwallet.GetWalletService;
-import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.getwallet.WalletRequest;
+import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
+import com.playtomic.tests.wallet.domain.model.Wallet;
 import com.playtomic.tests.wallet.domain.topup.TopUpRequest;
 import com.playtomic.tests.wallet.domain.topup.TopUpWalletService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,11 +42,11 @@ public class WalletController {
                                 response.setStatusCode(HttpStatusCode.valueOf(404));
                             return true;
                         })
-                .map(wallet -> new WalletDto(wallet.getId(), String.valueOf(wallet.getBalance())));
+                .map(toWalletDto());
     }
 
     @PostMapping(value = "/wallets/{id}/topup")
-    public Mono<Void> getWallet(@PathVariable("id") String id, @RequestBody TopUpDto topUp, ServerHttpResponse response) {
+    public Mono<WalletDto> topUp(@PathVariable("id") String id, @RequestBody TopUpDto topUp, ServerHttpResponse response) {
         return Mono.just(new TopUpRequest(id, topUp.creditCard(), new BigDecimal(topUp.amount())))
                 .flatMap(topUpWalletService::topUpWallet)
                 .onErrorComplete(
@@ -52,6 +54,11 @@ public class WalletController {
                             if (exception instanceof NonExistingWalletException)
                                 response.setStatusCode(HttpStatusCode.valueOf(404));
                             return true;
-                        }).then();
+                        })
+                .map(toWalletDto());
+    }
+
+    private Function<Wallet, WalletDto> toWalletDto() {
+        return wallet -> new WalletDto(wallet.getId(), String.valueOf(wallet.getBalance()));
     }
 }
