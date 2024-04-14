@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureWebTestClient
 @Import(TestData.class)
-@ActiveProfiles(profiles = "test")
+@ActiveProfiles(profiles = "develop")
 class WalletApplicationIT {
 
     @Autowired
