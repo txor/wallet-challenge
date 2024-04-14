@@ -1,5 +1,6 @@
 package com.playtomic.tests.wallet.domain.getwallet;
 
+import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.model.Wallet;
 import com.playtomic.tests.wallet.domain.model.WalletRepository;
 import lombok.RequiredArgsConstructor;

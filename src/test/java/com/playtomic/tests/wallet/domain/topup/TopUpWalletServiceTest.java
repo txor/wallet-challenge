@@ -3,12 +3,16 @@ package com.playtomic.tests.wallet.domain.topup;
 import com.playtomic.tests.wallet.domain.apiclient.ChargeRequest;
 import com.playtomic.tests.wallet.domain.apiclient.ChargeResponse;
 import com.playtomic.tests.wallet.domain.apiclient.PaymentApiClient;
+import com.playtomic.tests.wallet.domain.apiclient.PaymentApiException;
+import com.playtomic.tests.wallet.domain.model.CreditCardPaymentException;
+import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.model.Wallet;
 import com.playtomic.tests.wallet.domain.model.WalletRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
@@ -34,6 +38,9 @@ class TopUpWalletServiceTest {
     @Captor
     private ArgumentCaptor<Wallet> walletCaptor;
 
+    @InjectMocks
+    private TopUpWalletService topUpWalletService;
+
     @Test
     void topUpWallet() {
         String walletId = "1234";
@@ -45,7 +52,6 @@ class TopUpWalletServiceTest {
                 .thenReturn(Mono.just(new ChargeResponse("1234")));
         when(walletRepository.save(any()))
                 .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("100"))));
-        TopUpWalletService topUpWalletService = new TopUpWalletService(walletRepository, paymentApiClient);
 
         StepVerifier.create(topUpWalletService.topUpWallet(new TopUpRequest(walletId, creditCard, amount)))
                 .expectNextCount(1)
@@ -65,5 +71,41 @@ class TopUpWalletServiceTest {
                 () -> assertEquals(walletId, wallet.getId()),
                 () -> assertEquals(new BigDecimal("100"), wallet.getBalance())
         );
+    }
+
+    @Test
+    void topUpWalletEmitsErrorAndDoesNotTopUpIfPaymentApiClientThrowsPaymentApiException() {
+        String walletId = "1234";
+        String creditCard = "4242424242424242";
+        BigDecimal amount = new BigDecimal("5");
+        when(walletRepository.findById(anyString()))
+                .thenReturn(Mono.just(new Wallet(walletId, new BigDecimal("50"))));
+        when(paymentApiClient.charge(any(ChargeRequest.class)))
+                .thenReturn(Mono.error(new PaymentApiException()));
+
+        StepVerifier.create(topUpWalletService.topUpWallet(new TopUpRequest(walletId, creditCard, amount)))
+                .expectError(CreditCardPaymentException.class)
+                .verify();
+
+        verify(walletRepository).findById(anyString());
+        verify(paymentApiClient).charge(any(ChargeRequest.class));
+        verify(walletRepository, never()).save(any(Wallet.class));
+    }
+
+    @Test
+    void topUpWalletEmitsErrorAndDoesNotTopUpIfWalletDoesNotExist() {
+        String walletId = "1234";
+        String creditCard = "4242424242424242";
+        BigDecimal amount = new BigDecimal("5");
+        when(walletRepository.findById(anyString()))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(topUpWalletService.topUpWallet(new TopUpRequest(walletId, creditCard, amount)))
+                .expectError(NonExistingWalletException.class)
+                .verify();
+
+        verify(walletRepository).findById(anyString());
+        verify(paymentApiClient, never()).charge(any(ChargeRequest.class));
+        verify(walletRepository, never()).save(any(Wallet.class));
     }
 }

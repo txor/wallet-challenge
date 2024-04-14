@@ -1,7 +1,7 @@
 package com.playtomic.tests.wallet.api;
 
 import com.playtomic.tests.wallet.domain.getwallet.GetWalletService;
-import com.playtomic.tests.wallet.domain.getwallet.NonExistingWalletException;
+import com.playtomic.tests.wallet.domain.model.NonExistingWalletException;
 import com.playtomic.tests.wallet.domain.getwallet.WalletRequest;
 import com.playtomic.tests.wallet.domain.topup.TopUpRequest;
 import com.playtomic.tests.wallet.domain.topup.TopUpWalletService;
