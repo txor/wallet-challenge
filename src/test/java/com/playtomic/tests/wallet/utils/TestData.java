@@ -14,7 +14,10 @@ public class TestData {
 
     private final WalletRepository walletRepository;
 
-    public void givenThereIsAWallet(String walletId, String walletBalance) {
+    public void givenThereIsJustAWallet(String walletId, String walletBalance) {
+        StepVerifier
+                .create(walletRepository.deleteAll())
+                .verifyComplete();
         StepVerifier
                 .create(walletRepository.save(new Wallet(walletId, new BigDecimal(walletBalance))))
                 .expectNextCount(1)

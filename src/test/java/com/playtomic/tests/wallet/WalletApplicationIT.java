@@ -33,7 +33,7 @@ class WalletApplicationIT {
     void getWallet() {
         String walletId = "1234";
         String walletBalance = "50";
-        testData.givenThereIsAWallet(walletId, walletBalance);
+        testData.givenThereIsJustAWallet(walletId, walletBalance);
 
         webTestClient
                 .get()
@@ -49,7 +49,7 @@ class WalletApplicationIT {
     @Test
     void topUpWallet() {
         String walletId = "1234";
-        testData.givenThereIsAWallet(walletId, "50");
+        testData.givenThereIsJustAWallet(walletId, "50");
         String request = """
                     {
                         "credit-card": "4567890123451234",
