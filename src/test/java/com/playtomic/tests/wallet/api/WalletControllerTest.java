@@ -11,6 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +29,7 @@ class WalletControllerTest {
         String id = "1";
         String balance = "50.0";
         when(getWalletService.getWallet(any(WalletRequest.class)))
-                .thenReturn(Mono.just(new Wallet(id, Double.parseDouble(balance))));
+                .thenReturn(Mono.just(new Wallet(id, new BigDecimal(balance))));
 
         webTestClient
                 .get()

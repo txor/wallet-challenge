@@ -26,7 +26,7 @@ class WalletApplicationIT {
     @Test
     void getWallet() {
         String walletId = "1234";
-        Double walletBalance = 50.0;
+        String walletBalance = "50";
         testData.givenThereIsAWallet(walletId, walletBalance);
 
         webTestClient

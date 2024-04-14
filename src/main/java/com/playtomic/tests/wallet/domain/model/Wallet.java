@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class Wallet implements Persistable<String> {
 
     @Id
     private String id;
-    private Double balance;
+    private BigDecimal balance;
 
     @Override
     public boolean isNew() {
